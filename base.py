@@ -39,5 +39,4 @@ class BaseInterface:
         result_text = result.text
         if log_title:
             self.logger.log_event(log_title, f"响应时间：{lap} 状态码：{result.status_code} 响应结果{result_text}")
-        print(log_title, lap, result_text)
         return result

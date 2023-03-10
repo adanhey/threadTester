@@ -1,6 +1,7 @@
 from base import BaseInterface
 from tools.random_tools import *
 from project_data.interface_data import *
+import threading
 
 
 class PossibleCheck(BaseInterface):
@@ -13,12 +14,10 @@ class PossibleCheck(BaseInterface):
         for key, value in dic.items():
             if isinstance(value, dict):
                 if "data_from" in value:
-                    print(value)
                     dic[key] = self.get_from_data(value['data_from']['interface_name'],
                                                   value['data_from']['value_path'])
         if dic['data_type']:
             data_type = dic['data_type']
-            del (dic['data_type'])
             result = eval(f"self.base_request(inter_dic['uri'], inter_dic['method'], {data_type}=dic).json()")
         else:
             result = self.base_request(dic['uri'], dic['method']).json()
@@ -31,20 +30,33 @@ class PossibleCheck(BaseInterface):
             fin_re = fin_re[i]
         return fin_re
 
-    def prepare_data(self, case_dict, dic=None):
+    def prepare_data(self, case_dict, dic=None, make_none=[], dont_make=[], make_repeat=[],
+                     make_over_length=[]):
         if dic is None:
             dic = {}
         for key, value in case_dict.items():
-            if "is_dict" in value:
-                del (value['is_dict'])
-                dic_data = self.prepare_data(value)
+            if key in ['is_dict', 'is_list', 'data_type', 'list_mark']:
+                continue
+            if key in make_none:
+                dic[key] = None
+            elif key in dont_make:
+                continue
+            elif isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
+                dic[key] = value
+            elif "is_dict" in value:
+                dic_data = self.prepare_data(value, make_none=make_none, dont_make=dont_make,
+                                             make_repeat=make_repeat, make_over_length=make_over_length)
                 dic[key] = dic_data
             elif isinstance(value, list):
                 dic[key] = []
                 for obj in value:
-                    if "is_dict" in obj:
-                        del (obj['is_dict'])
-                        list_data = self.prepare_data(obj)
+                    if obj['list_mark'] in make_none:
+                        dic[key].append(None)
+                    elif obj['list_mark'] in dont_make:
+                        continue
+                    elif "is_dict" in obj:
+                        list_data = self.prepare_data(obj, make_none=make_none, dont_make=dont_make,
+                                                      make_repeat=make_repeat, make_over_length=make_over_length)
                         dic[key].append(list_data)
                     else:
                         v = random_data(obj)
@@ -52,13 +64,78 @@ class PossibleCheck(BaseInterface):
             elif "data_from" in value:
                 dic[key] = self.get_from_data(value['data_from']['interface_name'], value['data_from']['value_path'])
             else:
-                dic[key] = random_data(value)
+                if key in make_over_length:
+                    dic[key] = random_data(value, over_length=1)
+                else:
+                    dic[key] = random_data(value)
         return dic
 
-    def case_run(self, case_num, case_dict, run_type=1, run_title="随机"):
-        data = eval(f"self.prepare_data(case_dict[{case_dict['data_type']}])")
-        result = eval(f"self.base_request(case_dict['uri'], case_dict['method'], run_title,{case_dict['data_type']}=data)")
+    def make_case(self, case_dict, make_dict):
+        case_list = []
+        for key, value in make_dict.items():
+            if key in ['is_dict', 'is_list', 'data_type', 'list_mark']:
+                continue
+            single_case = self.prepare_data(case_dict[case_dict['data_type']], make_none=[key])
+            case_list.append(single_case)
+            single_case = self.prepare_data(case_dict[case_dict['data_type']], dont_make=[key])
+            case_list.append(single_case)
+            if isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
+                continue
+            elif "is_dict" in value:
+                cases = self.make_case(case_dict, value)
+                while True:
+                    if not cases:
+                        break
+                    case_list.append(cases.pop())
+            elif isinstance(value, list):
+                for obj in value:
+                    if "is_dict" in value:
+                        cases = self.make_case(case_dict[case_dict['data_type']], value)
+                        while True:
+                            if not cases:
+                                break
+                            case_list.append(cases.pop())
+                    else:
+                        single_case = self.prepare_data(case_dict[case_dict['data_type']],
+                                                        make_none=[obj['list_mark']])
+                        case_list.append(single_case)
+                        single_case = self.prepare_data(case_dict[case_dict['data_type']],
+                                                        dont_make=[obj['list_mark']])
+                        case_list.append(single_case)
+        return case_list
+
+    def performance_case_maker(self, case_num, case_dict):
+        case_list = []
+        for i in range(case_num):
+            case = self.prepare_data(case_dict[case_dict['data_type']])
+            case_list.append(case)
+        return case_list
+
+    def run_thread(self, cases, interface_info):
+        for i in range(len(cases)):
+            case = cases[i]
+            exec(
+                f"th{i} = threading.Thread(target=self.base_request, args=(interface_info['uri'],interface_info["
+                f"'method'],interface_info['name'],None,case))")
+        for i in range(len(cases)):
+            exec(f"th{i}.start()")
+
+    def run_case(self, interface_info, run_type=1, case_num=10, performance_run=None):
+        if run_type == 1:
+            cases = self.performance_case_maker(case_num, interface_info)
+        elif run_type == 2:
+            cases = self.make_case(interface_info, interface_info['json'])
+        else:
+            cases = []
+        if performance_run:
+            self.run_thread(cases, interface_info)
+        else:
+            for i in cases:
+                result = eval(
+                    f"self.base_request(interface_info['uri'],interface_info['method'],interface_info['name'],{interface_info['data_type']}=i)")
+                print(i)
+                print(result.text)
 
 
-a = PossibleCheck("汇服务")
-print(a.prepare_data(interfaces['test']['json']))
+a = PossibleCheck("汇服务测试1")
+a.run_case(interfaces['新增产品类别'], performance_run=1)

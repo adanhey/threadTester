@@ -33,6 +33,7 @@ interfaces = {
     },
     "test": {
         "uri": "",
+        "name": "",
         "method": "",
         "data_type": "json",
         "json": {
@@ -41,11 +42,13 @@ interfaces = {
                 "value_path": ["data", "records", 0, "id"]
             }},
             "list_data": [{
+                "list_mark": "list_data_1",
                 "is_dict": 1,
                 "str": {"data_length": 10, "data_type": "str"},
                 "int": {"data_range": [0, 1000], "data_type": "int"},
                 "float": {"data_range": [0, 1000], "decimal_range": [0, 999], "data_type": "float"},
-            }, {"data_length": 10, "data_type": "str"}, {"data_range": [0, 1000], "data_type": "int"}],
+            }, {"list_mark": "list_data_2", "data_length": 10, "data_type": "str"},
+                {"list_mark": "list_data_3", "data_range": [0, 1000], "data_type": "int"}],
             "str": {"data_length": 10, "data_type": "str"},
             "int": {"data_range": [0, 1000], "data_type": "int"},
             "float": {"data_range": [0, 1000], "decimal_range": [0, 999], "data_type": "float"},
@@ -55,6 +58,19 @@ interfaces = {
                 "int": {"data_range": [0, 1000], "data_type": "int"},
                 "float": {"data_range": [0, 1000], "decimal_range": [0, 999], "data_type": "float"},
             }
+        }
+    },
+    "新增产品类别": {
+        "uri": "/es/sparePartsType/saveOrUpdate",
+        "name": "新增产品类别",
+        "method": "post",
+        "data_type": "json",
+        "json": {
+            "typeName": "abcd",
+            "typeCode": {"data_length": 8, "data_type": "str"},
+            "remark": {"data_length": 100, "data_type": "str"},
+            "parentName": "",
+            "parentId": 0,
         }
     }
 }
