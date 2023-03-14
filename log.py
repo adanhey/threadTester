@@ -23,4 +23,7 @@ class TestLogger:
         for root, dirs, files in os.walk("./"):
             for file in files:
                 if self.log_sign in str(file):
-                    os.remove(file)
+                    try:
+                        os.remove(file)
+                    except:
+                        pass

@@ -1,3 +1,5 @@
+import time
+
 from base import BaseInterface
 from tools.random_tools import *
 from project_data.interface_data import *
@@ -111,31 +113,56 @@ class PossibleCheck(BaseInterface):
             case_list.append(case)
         return case_list
 
-    def run_thread(self, cases, interface_info):
+    def run_thread(self, cases, wait_finish=None):
         for i in range(len(cases)):
             case = cases[i]
+            interface_info = case['interface_info']
+            del (case['interface_info'])
             exec(
                 f"th{i} = threading.Thread(target=self.base_request, args=(interface_info['uri'],interface_info["
                 f"'method'],interface_info['name'],None,case))")
         for i in range(len(cases)):
             exec(f"th{i}.start()")
+        time.sleep(0.1)
+        if wait_finish:
+            for i in range(len(cases)):
+                while True:
+                    time.sleep(0.05)
+                    if not eval(f"th{i}.is_alive()"):
+                        break
 
-    def run_case(self, interface_info, run_type=1, case_num=10, performance_run=None):
+    def final_case(self, interface_info, run_type=1, case_num=10):
+        # 类型1随机并发
         if run_type == 1:
             cases = self.performance_case_maker(case_num, interface_info)
+        # 类型2接口全量验证
         elif run_type == 2:
             cases = self.make_case(interface_info, interface_info['json'])
         else:
             cases = []
+        return cases
+
+    def cases_run(self, cases, performance_run=None):
         if performance_run:
-            self.run_thread(cases, interface_info)
+            self.run_thread(cases)
         else:
             for i in cases:
+                interface_info = i['interface_info']
+                del (i['interface_info'])
                 result = eval(
                     f"self.base_request(interface_info['uri'],interface_info['method'],interface_info['name'],{interface_info['data_type']}=i)")
-                print(i)
-                print(result.text)
 
+    def interface_mid(self, cases_info, rounds=1, round_interval=1):
+        for ro in range(rounds):
+            run_cases = []
+            for i in cases_info:
+                case_i = self.final_case(interfaces[i['interfaceName']], case_num=i['caseNum'])
+                for case in case_i:
+                    case['interface_info'] = interfaces[i['interfaceName']]
+                while case_i:
+                    run_cases.append(case_i.pop())
+            self.cases_run(run_cases, performance_run=1)
+            time.sleep(round_interval)
 
-a = PossibleCheck("汇服务测试1")
-a.run_case(interfaces['新增产品类别'], performance_run=1)
+# a = PossibleCheck("汇服务测试1")
+# a.run_case(interfaces['新增产品类别'], performance_run=1)
