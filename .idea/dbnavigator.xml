@@ -39,7 +39,13 @@
     <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="481fc528-8f9f-4173-b785-94c9cd66a590" dataset="flaskdb.interfacefield" active-filter-id="EMPTY_FILTER">
+      <filter id="64ef5202-76be-4413-938f-b816f8d25060" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND" />
+    </filter-actions>
     <filter-actions connection-id="481fc528-8f9f-4173-b785-94c9cd66a590" dataset="mysql.general_log" active-filter-id="" />
+    <filter-actions connection-id="481fc528-8f9f-4173-b785-94c9cd66a590" dataset="flaskdb.interface" active-filter-id="80729427-6a07-4116-bf99-508d0651f3e5">
+      <filter id="80729427-6a07-4116-bf99-508d0651f3e5" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND" />
+    </filter-actions>
     <filter-actions connection-id="481fc528-8f9f-4173-b785-94c9cd66a590" dataset="mysql.global_grants" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.EditorStateManager">

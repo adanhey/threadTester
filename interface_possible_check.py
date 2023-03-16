@@ -3,7 +3,6 @@ import time
 from base import BaseInterface
 from tools.random_tools import *
 from project_data.interface_data import *
-import threading
 
 
 class PossibleCheck(BaseInterface):
@@ -92,7 +91,7 @@ class PossibleCheck(BaseInterface):
             elif isinstance(value, list):
                 for obj in value:
                     if "is_dict" in value:
-                        cases = self.make_case(case_dict[case_dict['data_type']], value)
+                        cases = self.make_case(case_dict[case_dict['data_type']], obj)
                         while True:
                             if not cases:
                                 break
@@ -150,7 +149,8 @@ class PossibleCheck(BaseInterface):
                 interface_info = i['interface_info']
                 del (i['interface_info'])
                 result = eval(
-                    f"self.base_request(interface_info['uri'],interface_info['method'],interface_info['name'],{interface_info['data_type']}=i)")
+                    f"self.base_request(interface_info['uri'],interface_info['method'],interface_info['name'],"
+                    f"{interface_info['data_type']}=i)")
 
     def interface_mid(self, cases_info, rounds=1, round_interval=1):
         for ro in range(rounds):

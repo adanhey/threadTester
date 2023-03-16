@@ -1,6 +1,6 @@
 from interface_possible_check import *
 from functools import wraps
-from sign_compare import *
+from Flask_part.sign_compare import *
 from http import HTTPStatus
 from flask import Flask, request
 
