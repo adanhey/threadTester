@@ -1,7 +1,6 @@
 import time
 from base import BaseInterface
 from tools.random_tools import *
-from project_data.interface_data import *
 from SQLconnect.db_file import *
 from tools.mysql_base import ProjectMysql
 import threading
