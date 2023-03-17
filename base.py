@@ -1,16 +1,19 @@
 import requests
-from project_info import *
 import hashlib
 from log import *
+from SQLconnect.db_file import *
 
 
 class BaseInterface:
-    def __init__(self, project_name, log_clean=1):
+    def __init__(self, project_id, env_name, log_clean=1):
         self.logger = TestLogger("test_log", log_clean=log_clean)
-        self.project_info = projects[project_name]
-        self.host = self.project_info['host']
-        self.account = self.project_info['account']
-        self.password = self.project_info['password']
+        self.project_id = project_id
+        with app.app_context():
+            self.env_info = ProjectEnv.query.filter(ProjectEnv.project_id == project_id,
+                                                    ProjectEnv.name == env_name).first()
+        self.host = self.env_info.host
+        self.account = self.env_info.account
+        self.password = self.env_info.password
         try:
             self.headers = {"Cookie": self.get_cookie()}
         except:

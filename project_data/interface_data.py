@@ -66,7 +66,7 @@ interfaces = {
         "method": "post",
         "data_type": "json",
         "json": {
-            "typeName": "abcd",
+            "typeName": {"data_length": 20, "data_type": "str"},
             "typeCode": {"data_length": 8, "data_type": "str"},
             "remark": {"data_length": 100, "data_type": "str"},
             "parentName": "",

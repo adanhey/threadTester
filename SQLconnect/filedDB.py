@@ -7,7 +7,7 @@ from Flask_part.flask_job import permission
 def create_field():
     require_data = ['interface_id', 'filed_name', 'data_type']
     full_data = ['interface_id', 'filed_name', 'data_type', 'data_from_interface', 'data_from_value_path',
-                 'data_length', 'data_range', 'decimal_range', 'parent_field']
+                 'data_length', 'data_range', 'decimal_range', 'parent_field', 'value_default']
     interface_info = request.json
     if isinstance(interface_info, list):
         add_result = []
@@ -22,7 +22,7 @@ def create_field():
                 continue
             elif InterfaceField.query.filter(InterfaceField.filed_name == interface_info[i]['filed_name'],
                                              InterfaceField.interface_id == interface_info[i]['interface_id']).first():
-                add_result.append(f"第{i + 1}条数据：接口下字段{interface_info[i]['name']}已存在")
+                add_result.append(f"第{i + 1}条数据：接口下字段{interface_info[i]['filed_name']}已存在")
             elif not Interface.query.filter(Interface.id == interface_info[i]['interface_id']).first():
                 add_result.append(f"第{i + 1}条数据：接口id{interface_info[i]['interface_id']}不存在")
             else:
@@ -33,7 +33,6 @@ def create_field():
                     else:
                         exec(f"{data} = None")
                     add_str += f"{data}={data},"
-                print(add_str)
                 interface_field1 = eval(f"InterfaceField({add_str})")
                 db.session.add(interface_field1)
         db.session.commit()
@@ -47,7 +46,7 @@ def create_field():
 def update_field():
     require_data = ['id']
     full_data = ['interface_id', 'filed_name', 'data_type', 'data_from_interface', 'data_from_value_path',
-                 'data_length', 'data_range', 'decimal_range', 'parent_field']
+                 'data_length', 'data_range', 'decimal_range', 'parent_field', 'value_default']
     interface_info = request.json
     if isinstance(interface_info, list):
         add_result = []
@@ -81,7 +80,7 @@ def update_field():
 
 @app.route('/deleteField', methods=['DELETE'])
 @permission
-def delete_interface():
+def delete_field():
     del_id = request.args.get("id")
     if not del_id:
         return {"message": "请求params缺少id"}, 400
@@ -96,7 +95,7 @@ def delete_interface():
 
 @app.route('/listField', methods=['GET'])
 @permission
-def list_interface():
+def list_field():
     select_pam = ['interface_id', 'filed_name', 'data_type']
     select_str = ""
     if not request.args.get('interface_id'):

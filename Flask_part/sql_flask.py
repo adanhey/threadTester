@@ -39,19 +39,30 @@ db = SQLAlchemy(app)
 #     data_type = db.Column(db.String(100), nullable=True)
 #     storage_time = db.Column(db.DateTime, default=datetime.now)
 #
-class InterfaceField(db.Model):
-    __tablename__ = 'interfaceField'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    interface_id = db.Column(db.Integer, nullable=False)
-    filed_name = db.Column(db.String(50), nullable=False)
-    data_from_interface = db.Column(db.String(50), nullable=True)
-    data_from_value_path = db.Column(db.String(100), nullable=True)
-    data_type = db.Column(db.String(30), nullable=False)
-    data_length = db.Column(db.Integer, nullable=True)
-    data_range = db.Column(db.String(1000), nullable=True)
-    decimal_range = db.Column(db.String(1000), nullable=True)
-    parent_field = db.Column(db.Integer, nullable=True)
-    storage_time = db.Column(db.DateTime, default=datetime.now)
+# class InterfaceField(db.Model):
+#     __tablename__ = 'interfaceField'
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     interface_id = db.Column(db.Integer, nullable=False)
+#     filed_name = db.Column(db.String(50), nullable=False)
+#     value_default = db.Column(db.String(50), nullable=True)
+#     data_from_interface = db.Column(db.String(50), nullable=True)
+#     data_from_value_path = db.Column(db.String(100), nullable=True)
+#     data_type = db.Column(db.String(30), nullable=False)
+#     data_length = db.Column(db.Integer, nullable=True)
+#     data_range = db.Column(db.String(1000), nullable=True)
+#     decimal_range = db.Column(db.String(1000), nullable=True)
+#     parent_field = db.Column(db.Integer, nullable=True)
+#     storage_time = db.Column(db.DateTime, default=datetime.now)
+
+# class ProjectEnv(db.Model):
+#     __tablename__ = 'environment'
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     project_id = db.Column(db.Integer, nullable=False)
+#     name = db.Column(db.String(50), nullable=False)
+#     host = db.Column(db.String(50), nullable=True)
+#     account = db.Column(db.String(100), nullable=True)
+#     password = db.Column(db.String(30), nullable=True)
+#     storage_time = db.Column(db.DateTime, default=datetime.now)
 
 
 if __name__ == '__main__':

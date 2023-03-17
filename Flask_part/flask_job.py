@@ -1,3 +1,4 @@
+import threading
 from interface_possible_check import *
 from functools import wraps
 from Flask_part.sign_compare import *
@@ -29,17 +30,17 @@ def handle_403_error(err):
 @app.route('/runCase', methods=['POST'])
 @permission
 def run_case():
-    environment = request.json['environment']
+    environmentid = request.json['environment_id']
     interface_data = request.json['interfaceData']
     rounds, round_interval = 1, 1
     if 'rounds' in request.json:
         rounds = request.json['rounds']
     if 'round_interval' in request.json:
         round_interval = request.json['round_interval']
-    a = PossibleCheck(environment)
-    interface_th = threading.Thread(target=a.interface_mid, args=(interface_data, rounds, round_interval))
+    mission = PossibleCheck(environmentid, request.json['env_name'])
+    interface_th = threading.Thread(target=mission.interface_mid, args=(interface_data, rounds, round_interval))
     interface_th.start()
-    return {"message": "任务下发成功", "filepath": f"{a.logger.now_time}{a.logger.log_sign}.log"}
+    return {"message": "任务下发成功", "filepath": f"{mission.logger.now_time}{mission.logger.log_sign}.log"}
 
 
 @app.route('/getLog', methods=['GET'])
